@@ -34,6 +34,8 @@ let isWork = ref(true);
 var megumin = new Audio('audio/megumin.mp3')
 var yo = new Audio('audio/yo.mp3')
 
+// sdfsdf
+
 const inputStore = useInputStore()
 
 const time = new Date()
