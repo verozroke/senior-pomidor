@@ -1,1 +1,0 @@
-import{h as t}from"./index-e9da0562.js";const o=t("inputStore",{state:()=>({workTime:null,restTime:null}),actions:{changeWorkTime(e){this.workTime=e},changeRestTime(e){this.restTime=e}}});export{o as u};
