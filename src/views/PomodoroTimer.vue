@@ -2,8 +2,7 @@
     <div :class="['timer', {'blue-bg': isWork}, {'green-bg': !isWork}]">
         <div class="timer__container">
             <div class="timer__box">
-                <div v-if="isWork" class="timer__title">work</div>
-                <div v-else class="timer__title">rest</div>
+                <div v-if="isWork" class="timer__title">{{ isWork ? 'work' : 'rest' }}</div>
                 <div v-if="isWork" class="timer__clock">{{ (workTime >= 60) ? timer.hours.value + ':' : '' }}{{ getMyFuckingMinutes() }}:{{ getMyFuckingSeconds() }}</div>
                 <div v-else class="timer__clock">{{ (restTime >= 60) ? timer.hours.value + ':' : '' }}{{ getMyFuckingMinutes() }}:{{ getMyFuckingSeconds() }}</div>
             </div>
