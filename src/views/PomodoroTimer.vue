@@ -4,19 +4,13 @@
             <div class="timer__box">
                 <div v-if="isWork" class="timer__title">work</div>
                 <div v-else class="timer__title">rest</div>
-                <div v-if="isWork" class="timer__clock">{{ (inputStore.workTime >= 60) ? timer.hours.value + ':' : '' }}{{ getMyFuckingMinutes() }}:{{ getMyFuckingSeconds() }}</div>
-                <div v-else class="timer__clock">{{ (inputStore.restTime >= 60) ? timer.hours.value + ':' : '' }}{{ getMyFuckingMinutes() }}:{{ getMyFuckingSeconds() }}</div>
+                <div v-if="isWork" class="timer__clock">{{ (workTime >= 60) ? timer.hours.value + ':' : '' }}{{ getMyFuckingMinutes() }}:{{ getMyFuckingSeconds() }}</div>
+                <div v-else class="timer__clock">{{ (restTime >= 60) ? timer.hours.value + ':' : '' }}{{ getMyFuckingMinutes() }}:{{ getMyFuckingSeconds() }}</div>
             </div>
             <ul class="timer__row">
-                <li class="timer__el" @click="restartTimer((isWork) ? inputStore.workTime : inputStore.restTime)">reset</li>
-                <template v-if="timerActive">
-                    <li @click="stopTimer()" class="timer__el">stop</li>
-                </template>
-                <template v-else>
-                    <li @click="startTimer()" class="timer__el">resume</li>
-                </template>
-                <li v-if="isWork" class="timer__el" @click="changeMode()">go rest</li>
-                <li v-else class="timer__el" @click="changeMode()">go work</li>
+                <li class="timer__el" @click="restartTimer((isWork) ? workTime : restTime)">reset</li>
+                <li @click="changeTimeStep" class="timer__el">{{ timerActive ? 'stop' : 'resume' }}</li>
+                <li class="timer__el" @click="changeMode">{{ isWork ? 'go rest' : 'go work' }}</li>
             </ul>
             <RouterLink :to="{name:'Home'}" id="change-timer" class="timer__primary-btn">change timer</RouterLink>
         </div>
@@ -24,8 +18,7 @@
 </template>
 
 <script setup>
-import { useInputStore } from '../stores/InputStore';
-import { ref,  onMounted, watchEffect } from 'vue';
+import { ref,  onMounted, watchEffect, onBeforeMount } from 'vue';
 import {useTimer} from 'vue-timer-hook' 
 
 let timerActive = ref(true);
@@ -35,24 +28,43 @@ var megumin = new Audio('audio/megumin.mp3')
 var yo = new Audio('audio/yo.mp3')
 
 // sdfsdf
+let workTime
+let restTime
+let timer
 
-const inputStore = useInputStore()
-
-const time = new Date()
-
-time.setSeconds(time.getSeconds() + inputStore.workTime * 60)
-
-const timer = useTimer(time)
+const changeTimeStep = () => {
+    if(timerActive.value) {
+        stopTimer()
+    } else {
+        startTimer()
+    }
+}
 
 function changeMode() {
     if(isWork.value) {
         isWork.value = !isWork.value
-        restartTimer(inputStore.restTime)
+        localStorage.setItem('isWork', isWork.value)
+        restartTimer(restTime.value)
     } else {
         isWork.value = !isWork.value
-        restartTimer(inputStore.workTime)
+        localStorage.setItem('isWork', isWork.value)
+        restartTimer(workTime.value)
     }
 }
+
+onBeforeMount(() => {
+
+    let time = new Date()
+
+    isWork.value = JSON.parse(localStorage.getItem('isWork'))
+    workTime = ref(localStorage.getItem('workTime'))
+    restTime = ref(localStorage.getItem('restTime'))
+
+    let timeToPass = localStorage.getItem('seconds') ? localStorage.getItem('seconds') : workTime.value * 60 
+    time.setSeconds(time.getSeconds() + parseInt(timeToPass))
+
+    timer = useTimer(time)
+})
 
 
 onMounted(() => {
@@ -90,6 +102,8 @@ function getMyFuckingSeconds() {
     } else {
         time = timer.seconds.value
     }
+    const someTime = timer.minutes.value * 60 + timer.seconds.value
+    localStorage.setItem('seconds', someTime)
     return time
 }
 

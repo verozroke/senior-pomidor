@@ -1,17 +1,24 @@
 <script setup>
-import { ref } from 'vue'
-import { useInputStore } from '../stores/InputStore'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+onMounted(() => {
+    localStorage.clear()
+})
 
 
-const inputStore = useInputStore()
 
 const workTimeInput = ref(null)
 const restTimeInput = ref(null)
 
 function sendData() {
     if(Number(workTimeInput.value) && Number(restTimeInput.value)) {
-        inputStore.changeWorkTime(Number(workTimeInput.value))
-        inputStore.changeRestTime(Number(restTimeInput.value))
+        localStorage.setItem('workTime', workTimeInput.value)
+        localStorage.setItem('restTime', restTimeInput.value)
+        localStorage.setItem('isWork', true)
+        router.push('/fgewjr123dfhje')
     } else {
         const message = document.querySelector('.home__message')
         message.style.opacity = '1';
@@ -32,10 +39,10 @@ function sendData() {
         <div class="home__container">
             <div class="home__title">welcome to pomodoro</div>
             <div class="home__form form">
-                    <input v-model="workTimeInput" type="text" class="home__input"  placeholder="enter the work time (min)">
-                    <input v-model="restTimeInput" type="text" class="home__input"  placeholder="enter the rest time (min)">
+                    <input @keypress.enter="sendData()" v-model="workTimeInput" type="text" class="home__input"  placeholder="enter the work time (min)">
+                    <input @keypress.enter="sendData()" v-model="restTimeInput" type="text" class="home__input"  placeholder="enter the rest time (min)">
                     <div class="home__message">Invalid input.</div>
-                <RouterLink :to="(Number(workTimeInput)  && Number(restTimeInput)) ? {name: 'Pomodoro'} : {name: 'Home'}" @click="sendData()" class="home__submit">go</RouterLink>
+                <button @click="sendData()" class="home__submit">go</button>
             </div>
         </div>
     </div>
